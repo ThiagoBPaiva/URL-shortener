@@ -1,33 +1,83 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Encurtador de URL</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header>
-    <h2>EscurtaTudo</h2>
-    <nav>
-      <a href="#">Home</a>
-      <a href="#">Sobre</a>
-      <a href="#">Contato</a>
-    </nav>
-  </header>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Encurtador de URL</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<header>
+			<h2>EscurtaTudo</h2>
+			<nav>
+				<a href="#">Home</a>
+				<a href="#">Sobre</a>
+				<a href="#">Contato</a>
+			</nav>
+		</header>
 
-  <div class="container">
-    <h1>Encurtador de URL</h1>
-    <form action="http://localhost:3000/" method="get">
-      <label for="urlLabel">Cole sua URL:</label>
-      <input type="url" id="url" name="url" placeholder="https://exemplo.com" required>
-      <label for="urlLabel">Personalize a sua URL:</label>
-      <input type="text" id="text" name="mask" placeholder="batatas" required>
-      <input type="submit" value="Encurtar">
-    </form>
-    <div class="resultado">
-      <!-- Aqui vai aparecer a URL encurtada -->
-    </div>
-  </div>
-</body>
+		<div class="container">
+			<h1>Encurtador de URL</h1>
+			<form action="http://localhost:3000/" id="form" method="get">
+				<label for="urlLabel">Cole sua URL:</label>
+				<input
+					type="url"
+					id="url"
+					name="url"
+					placeholder="https://exemplo.com"
+					required
+				/>
+				<label for="urlLabel">Personalize a sua URL:</label>
+				<input
+					type="text"
+					id="text"
+					name="mask"
+					placeholder="batatas"
+					required
+				/>
+				<input type="submit" value="Encurtar" />
+			</form>
+			<div class="resultado">
+				A url já é armarzenada no seu copiar e colar
+			</div>
+		</div>
+
+		<script>
+			const form = document.getElementById("form");
+			const texto = document.getElementById("resultado");
+
+			form.addEventListener("submit", async (e) => {
+				e.preventDefault(); // Impede o envio padrão do formulário
+
+				try {
+					const formData = new FormData(form);
+					const data = Object.fromEntries(formData.entries());
+
+					const res = await fetch("/json-form", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify(data),
+					});
+
+
+					const json = await res.json();
+					const mask = json.dados.mascara;
+
+					// Define o texto na tela
+					const urlFinal = `http://localhost:3000/url/${mask}`;
+					navigator.clipboard.writeText(urlFinal);
+					console.log(urlFinal);
+					
+
+					// Redireciona o usuário para a nova URL, se for o objetivo
+					window.location.href = 'http://localhost:3000';
+				} catch (error) {
+					// Trata qualquer erro que possa ter ocorrido durante a requisição
+					console.error("Ocorreu um erro na requisição:", error);
+					texto.textContent =
+						"Ocorreu um erro ao gerar a URL. Tente novamente.";
+				}
+			});
+		</script>
+	</body>
 </html>

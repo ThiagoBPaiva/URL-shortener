@@ -1,8 +1,9 @@
 import express, { Router } from 'express';
-import { testeRoter, confirmUrl } from '../controllers/url-project.controllers'
+import { testeRoter, confirmUrl, json_form } from '../controllers/url-project.controllers'
 
 export const router = Router();
 
 
 router.get('/', testeRoter);
-router.post('/url', confirmUrl)
+router.get('/url/:url', confirmUrl)
+router.post('/json-form', json_form)

@@ -16,7 +16,7 @@ export async function teste(): Promise<number> {
 
 export async function createNewURL(url: string, name: string): Promise<InsertResponse<ResultSetHeader> | string> {
 	try {
-		const sqlComand: string = "INSERT INTO urls (original_url, short_code) VALUES (?, ?)"
+		const sqlComand: string = "INSERT INTO urls (url, mask) VALUES (?, ?)"
 		const values: string[] = [url, name];
 
 		const [result] = await pool.execute<ResultSetHeader>(sqlComand, values);
@@ -31,4 +31,22 @@ export async function createNewURL(url: string, name: string): Promise<InsertRes
 		return `Erro ao tentar criar nova url: ${err}`;
 	}
 
+}
+
+export async function getUrl(mask: string): Promise<string[]> {
+	const arrayResult: string[] = [];
+	try {
+		const dbCode = "SELECT * FROM urls WHERE mask = ?";
+		const [rows] = await pool.execute<RowDataPacket[]>(dbCode, [mask]);
+
+		if (rows.length > 0) {
+			arrayResult.push(rows[0].Url, rows[0].Mask);
+		}
+		
+	} catch (err) {
+		console.log(err);
+		arrayResult.push(String(err));
+	}
+
+	return arrayResult;
 }
